@@ -1,8 +1,12 @@
 import pool from '../config/db.js';
 
 export const TodoModel = {
-  getByUserId: async (userId: number) => {
-    const [rows] = await pool.query('SELECT * FROM todos WHERE user_id = ?', [userId]);
+  // Perbarui getByUserId dengan menambahkan limit dan offset
+  getByUserId: async (userId: number, limit: number, offset: number) => {
+    const [rows] = await pool.query(
+      'SELECT * FROM todos WHERE user_id = ? LIMIT ? OFFSET ?',
+      [userId, limit, offset]
+    );
     return rows;
   },
 
@@ -39,5 +43,14 @@ export const TodoModel = {
       [id, userId]
     );
     return result.affectedRows;
+  },
+
+  // Method baru sesuai modul: Menghitung total data todo milik user untuk pagination
+  countByUserId: async (userId: number): Promise<number> => {
+    const [rows]: any = await pool.query(
+      'SELECT COUNT(*) as total FROM todos WHERE user_id = ?',
+      [userId]
+    );
+    return rows[0].total;
   },
 };
